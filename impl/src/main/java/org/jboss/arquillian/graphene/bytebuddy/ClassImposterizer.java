@@ -78,10 +78,7 @@ public class ClassImposterizer {
     private static final DefaultNamingPolicy DEFAULT_POLICY = new DefaultNamingPolicy();
     private static final SignedNamingPolicy SIGNED_POLICY = new SignedNamingPolicy();
 
-
-    public static ClassImposterizer getInstance() {
-        return INSTANCE;
-    }
+    protected ClassImposterizer() { }
 
     private static final class DefaultNamingPolicy extends NamingStrategy.AbstractBase {
         @Override
@@ -118,7 +115,7 @@ public class ClassImposterizer {
         }
     };
 
-    public <T> T imposteriseProtected(MethodInterceptor interceptor, Class<?> mockedType, Class<?>... ancillaryTypes) {
+    protected <T> T imposteriseProtected(MethodInterceptor interceptor, Class<?> mockedType, Class<?>... ancillaryTypes) {
         if (mockedType.isInterface()) {
             return imposteriseInterface(interceptor, mockedType, ancillaryTypes);
         } else {
@@ -138,11 +135,6 @@ public class ClassImposterizer {
         if (!Modifier.isPublic(mockedInterface.getModifiers())) {
             throw new IllegalArgumentException("Imposterized interface must be public: " + mockedInterface);
         }
-
-//        List<Class<?>> list = new ArrayList<Class<?>>(Arrays.asList(ancillaryTypes));
-//        list.add(mockedInterface);
-
-//        Class<?>[] interfaces = list.toArray(new Class<?>[list.size()]);
 
         return imposteriseClass(interceptor, mockedInterface, ancillaryTypes);
     }
