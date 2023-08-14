@@ -117,7 +117,7 @@ public class PageFragmentEnricher extends AbstractSearchContextEnricher {
             final SearchContext localSearchContext;
             if (grapheneContext == null) {
                 grapheneContext = GrapheneContext.getContextFor(ReflectionHelper.getQualifier(field.getAnnotations()));
-                localSearchContext = grapheneContext.getWebDriver(false, SearchContext.class);
+                localSearchContext = grapheneContext.getWebDriver(SearchContext.class);
             } else {
                 localSearchContext = searchContext;
             }
@@ -162,7 +162,7 @@ public class PageFragmentEnricher extends AbstractSearchContextEnricher {
         GrapheneContext grapheneContext = ((GrapheneProxyInstance) searchContext).getGrapheneContext();
         List<T> result = GrapheneProxy.getProxyForFutureTarget(grapheneContext, new FutureTarget() {
             @Override
-            public Object getTarget(boolean dontProxy) {
+            public Object getTarget() {
                 List<WebElement> elements = searchContext.findElements(rootBy);
                 List<T> fragments = new ArrayList<T>();
                 for (int i = 0; i < elements.size(); i++) {
@@ -235,7 +235,7 @@ public class PageFragmentEnricher extends AbstractSearchContextEnricher {
     }
 
     private static <T> T createProxyDelegatingToRoot(final WebElement root, Class<T> clazz, final Class<?> webElementType) {
-        return ClassImposterizer.imposterise(new Interceptor(root, webElementType), clazz, webElementType);
+        return ClassImposterizer.INSTANCE.imposterise(new Interceptor(root, webElementType), clazz, webElementType);
     }
 
     protected final void setupPageFragmentList(SearchContext searchContext, Object target, Field field)

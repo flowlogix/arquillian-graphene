@@ -24,7 +24,6 @@ package org.jboss.arquillian.graphene.enricher;
 import java.lang.reflect.Method;
 
 import org.jboss.arquillian.graphene.proxy.GrapheneProxy;
-import org.jboss.arquillian.graphene.proxy.GrapheneProxyUtil;
 import org.jboss.arquillian.graphene.proxy.Interceptor;
 import org.jboss.arquillian.graphene.proxy.InvocationContext;
 import org.openqa.selenium.By;
@@ -39,8 +38,8 @@ public class SearchContextInterceptor implements Interceptor {
     public Object intercept(final InvocationContext context) throws Throwable {
         GrapheneProxy.FutureTarget future = new GrapheneProxy.FutureTarget() {
             @Override
-            public Object getTarget(boolean dontProxy) {
-                return GrapheneProxyUtil.notProxy(context.getProxy(), false);
+            public Object getTarget() {
+                return context.getProxy();
             }
         };
         if (methodsEqual(context.getMethod(), SearchContext.class.getDeclaredMethod("findElement", By.class))) {

@@ -25,8 +25,6 @@ import net.bytebuddy.implementation.bind.annotation.Empty;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import org.jboss.arquillian.graphene.cglib.MethodInterceptor;
 
-import java.lang.reflect.Method;
-
 /**
  * Utility class with helper methods for building interceptors using {@link InterceptorBuilder}.
  *
@@ -41,6 +39,6 @@ public final class Interceptors {
     }
 
     public static <T> T any(Class<T> type) {
-        return (T) ClassImposterizer.imposterise(new Interceptor(), type);
+        return (T) ClassImposterizer.INSTANCE.imposterise(new Interceptor(), type);
     }
 }

@@ -36,7 +36,7 @@ public class TestGrapheneProxyInstantiation {
         FutureTarget target = new FutureTarget() {
 
             @Override
-            public Object getTarget(boolean dontProxy) {
+            public Object getTarget() {
                 throw new ExpectedException();
             }
         };

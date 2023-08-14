@@ -80,7 +80,7 @@ public abstract class GrapheneProxyHandler implements InvocationHandler, MethodI
                                    @AllArguments Object[] args) throws Throwable {
         GrapheneProxyHandler handler = (GrapheneProxyHandler) interceptor;
         if (method.getName().equals("unwrap")) {
-            return handler.getTarget(true);
+            return handler.getTarget();
         } else {
             return handler.intercept(self, method, args);
         }
@@ -161,7 +161,7 @@ public abstract class GrapheneProxyHandler implements InvocationHandler, MethodI
      *
      * @return the real target for invocation
      */
-    protected Object getTarget(boolean dontProxy) {
-        return (future == null) ? GrapheneProxyUtil.notProxy(target, dontProxy) : future.getTarget(dontProxy);
+    protected Object getTarget() {
+        return (future == null) ? target : future.getTarget();
     }
 }

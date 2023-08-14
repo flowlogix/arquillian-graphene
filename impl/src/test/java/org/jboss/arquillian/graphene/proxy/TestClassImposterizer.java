@@ -49,32 +49,32 @@ public class TestClassImposterizer implements MethodInterceptor {
 
     @Test
     public void testClass() {
-        Object object = ClassImposterizer.imposterise(this, TestingClass.class);
+        Object object = ClassImposterizer.INSTANCE.imposterise(this, TestingClass.class);
         assertTrue(object instanceof TestingClass);
     }
 
     @Test
     public void testInterface() {
-        Object object = ClassImposterizer.imposterise(this, TestingInterface.class);
+        Object object = ClassImposterizer.INSTANCE.imposterise(this, TestingInterface.class);
         assertTrue(object instanceof TestingInterface);
     }
 
     @Test
     public void testAbstractClass() {
-        Object object = ClassImposterizer.imposterise(this, TestingAbstractClass.class);
+        Object object = ClassImposterizer.INSTANCE.imposterise(this, TestingAbstractClass.class);
         assertTrue(object instanceof TestingAbstractClass);
     }
 
     @Test
     public void testClassAndInterface() {
-        Object object = ClassImposterizer.imposterise(this, TestingClass2.class, TestingInterface.class);
+        Object object = ClassImposterizer.INSTANCE.imposterise(this, TestingClass2.class, TestingInterface.class);
         assertTrue(object instanceof TestingClass2);
         assertTrue(object instanceof TestingInterface);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testPrivateInterface() {
-        Object object = ClassImposterizer.imposterise(this, TestingPrivateInterface.class);
+        Object object = ClassImposterizer.INSTANCE.imposterise(this, TestingPrivateInterface.class);
         assertTrue(object instanceof TestingPrivateInterface);
     }
 

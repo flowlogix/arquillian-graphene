@@ -61,7 +61,7 @@ public class WebElementEnricher extends AbstractSearchContextEnricher {
                 final SearchContext localSearchContext;
                 if (grapheneContext == null) {
                     grapheneContext = GrapheneContext.getContextFor(ReflectionHelper.getQualifier(field.getAnnotations()));
-                    localSearchContext = grapheneContext.getWebDriver(false, SearchContext.class);
+                    localSearchContext = grapheneContext.getWebDriver(SearchContext.class);
                 } else {
                     localSearchContext = searchContext;
                 }

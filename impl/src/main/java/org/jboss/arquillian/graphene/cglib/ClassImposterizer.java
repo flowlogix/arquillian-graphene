@@ -57,9 +57,9 @@ import net.bytebuddy.dynamic.DynamicType;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
-
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
+
 /**
  * Thanks to jMock guys for this handy class that wraps all the cglib magic.
  * In particular it workarounds a cglib limitation by allowing to proxy a class even if the misses a no args constructor.
@@ -130,13 +130,7 @@ public class ClassImposterizer {
     protected <T> T imposteriseClass(MethodInterceptor interceptor, Class<?> mockedType, Class<?>... ancillaryTypes) {
         setConstructorsAccessible(mockedType, true);
         Class<?> proxyClass = createProxyClass(mockedType, interceptor.getClass(), ancillaryTypes);
-        try {
-            return (T) mockedType.cast(createProxy(proxyClass, interceptor));
-        } catch (ClassCastException e) {
-            System.out.format("*** ***cast** interceptor: %s, type: %s, interfaces: %s, classInterfaces: %s\n",
-                    interceptor, mockedType, Arrays.asList(ancillaryTypes), Arrays.asList(proxyClass.getInterfaces()));
-            throw e;
-        }
+        return (T) mockedType.cast(createProxy(proxyClass, interceptor));
     }
 
     protected <T> T imposteriseInterface(MethodInterceptor interceptor, Class<?> mockedInterface, Class<?>... ancillaryTypes) {
@@ -159,21 +153,11 @@ public class ClassImposterizer {
         }
     }
     private <T> Class<?> createProxyClass(Class<?> mockedType, Class<?> interceptorType, Class<?>...interfaces) {
-        System.out.format("Looking up proxy: %s[%s]\n", mockedType, interceptorType);
         return cache.findOrInsert(interceptorType.getClassLoader(), mockedType,
                 () -> createProxyClassInternal(mockedType, interceptorType, interfaces));
-//        return createProxyClassInternal(mockedType, interceptor, interfaces);
     }
 
     private <T> Class<?> createProxyClassInternal(Class<?> mockedType, Class<?> interceptorType, Class<?>...interfaces) {
-//        System.err.println("Create proxy for: " + mockedType.getName());
-//        System.err.println("Interfaces: " + Arrays.asList(interfaces));
-//        System.err.println("Interceptor: " + interceptor.toString());
-        if (mockedType.getName().endsWith(TAG)) {
-            System.err.println("Already have proxy, returning");
-            return mockedType;
-        }
-        System.out.format("** Creating proxy: %s[%s]\n", mockedType, interceptorType);
         DynamicType.Unloaded unloadedType = new ByteBuddy()
                 .with(mockedType.getSigners() != null ? SIGNED_POLICY : DEFAULT_POLICY)
                 .subclass(mockedType)

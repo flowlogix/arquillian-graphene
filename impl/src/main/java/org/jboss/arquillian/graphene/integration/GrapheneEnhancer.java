@@ -61,7 +61,7 @@ public class GrapheneEnhancer implements DroneInstanceEnhancer<WebDriver> {
     public WebDriver enhance(WebDriver driver, Class<? extends Annotation> qualifier) {
         GrapheneContext grapheneContext = GrapheneContext.setContextFor(configuration.get(), driver, qualifier);
         Class<?>[] interfaces = GrapheneProxyUtil.getInterfaces(driver.getClass());
-        return grapheneContext.getWebDriver(false, interfaces);
+        return grapheneContext.getWebDriver(interfaces);
     }
 
     /**

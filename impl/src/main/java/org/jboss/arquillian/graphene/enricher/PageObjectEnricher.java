@@ -83,7 +83,7 @@ public class PageObjectEnricher extends AbstractSearchContextEnricher {
         if (grapheneContext == null) {
             grapheneContext =
                 GrapheneContext.getContextFor(ReflectionHelper.getQualifier(annotations));
-            localSearchContext = grapheneContext.getWebDriver(false, SearchContext.class);
+            localSearchContext = grapheneContext.getWebDriver(SearchContext.class);
         } else {
             localSearchContext = searchContext;
         }

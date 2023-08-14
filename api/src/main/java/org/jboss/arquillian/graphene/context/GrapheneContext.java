@@ -54,11 +54,7 @@ public abstract class GrapheneContext {
      * @param interfaces interfaces which should be implemented by the returned {@link WebDriver}
      * @return proxy for the {@link WebDriver} held in the context
      */
-    public abstract WebDriver getWebDriver(boolean noProxy, Class<?>... interfaces);
-
-    public WebDriver getWebDriver(Class<?>... interfaces) {
-        return getWebDriver(false, interfaces);
-    }
+    public abstract WebDriver getWebDriver(Class<?>... interfaces);
 
     /**
      * Returns configuration for the context

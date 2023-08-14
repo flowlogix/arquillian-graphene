@@ -75,7 +75,7 @@ public class DefaultExecutionResolver implements ExecutionResolver, org.jboss.ar
         for (long i=1; i<=5; i++) {
             try {
                 // execute javascript
-                Object returnValue = executeScriptForCall((JavascriptExecutor) context.getWebDriver(true, JavascriptExecutor.class), call);
+                Object returnValue = executeScriptForCall((JavascriptExecutor) context.getWebDriver(JavascriptExecutor.class), call);
                 Object castedResult = castResult(call, returnValue);
                 return castedResult;
             } catch (RuntimeException e) {

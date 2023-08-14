@@ -64,7 +64,7 @@ public class JSInterfaceHandler implements MethodInterceptor {
             return null;
         }
         if (method.getName().equals("unwrap")) {
-            return GrapheneProxyUtil.notProxy(handler.getTarget(), true);
+            return handler.getTarget();
         }
         args = (args != null) ? args : new Object[]{};
         JSCall call = new JSCall(new JSMethod(handler.target, method), args);

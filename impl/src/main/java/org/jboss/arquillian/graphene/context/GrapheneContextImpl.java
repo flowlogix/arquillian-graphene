@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.jboss.arquillian.drone.api.annotation.Default;
-import org.jboss.arquillian.graphene.cglib.ClassImposterizer;
 import org.jboss.arquillian.graphene.enricher.SearchContextInterceptor;
 import org.jboss.arquillian.graphene.enricher.StaleElementInterceptor;
 import org.jboss.arquillian.graphene.page.extension.PageExtensionInstallatorProvider;
@@ -50,7 +49,6 @@ public class GrapheneContextImpl extends ExtendedGrapheneContext {
     private final GrapheneConfiguration configuration;
     private final WebDriver webDriver;
     private final Class<?> qualifier;
-    private final ClassImposterizer classImposterizer;
     /**
      * This field contains a reference to the context associated to the current
      * active browser actions. {@link LazyContext} instance is placed here.
@@ -84,7 +82,6 @@ public class GrapheneContextImpl extends ExtendedGrapheneContext {
         this.configuration = configuration;
         this.webDriver = webDriver;
         this.qualifier = qualifier;
-        classImposterizer = new ClassImposterizer();
     }
 
     public BrowserActions getBrowserActions() {
@@ -103,11 +100,6 @@ public class GrapheneContextImpl extends ExtendedGrapheneContext {
         return null;
     }
 
-    @Override
-    public ClassImposterizer getImposterizerInstance() {
-        return classImposterizer;
-    }
-
     /**
      * If the {@link WebDriver} instance is not available yet, the returned
      * proxy just implements {@link WebDriver} interface. If the {@link WebDriver}
@@ -116,8 +108,8 @@ public class GrapheneContextImpl extends ExtendedGrapheneContext {
      * @param interfaces interfaces which should be implemented by the returned {@link WebDriver}
      * @return proxy for the {@link WebDriver} held in the context
      */
-    public WebDriver getWebDriver(boolean dontProxy, Class<?>... interfaces) {
-        return GrapheneProxyUtil.notProxy(webDriver, dontProxy);
+    public WebDriver getWebDriver(Class<?>... interfaces) {
+        return webDriver;
     }
 
     /**
@@ -151,11 +143,10 @@ public class GrapheneContextImpl extends ExtendedGrapheneContext {
                 try {
                     context = new LazyContext(qualifier, new BrowserActions(qualifier.getName()));
                     context.handler = GrapheneContextualHandler.forFuture(context, context.getFutureTarget());
-                    GrapheneProxyInstance proxy = (GrapheneProxyInstance) context.getWebDriver(false);
+                    GrapheneProxyInstance proxy = (GrapheneProxyInstance) context.getWebDriver();
                     proxy.registerInterceptor(new SearchContextInterceptor());
                     proxy.registerInterceptor(new StaleElementInterceptor());
-                    context.installatorProvider = new RemotePageExtensionInstallatorProvider(context.registry,
-                            (JavascriptExecutor) context.getWebDriver(false, JavascriptExecutor.class));
+                    context.installatorProvider = new RemotePageExtensionInstallatorProvider(context.registry, (JavascriptExecutor) context.getWebDriver(JavascriptExecutor.class));
                     final GrapheneContext finalContext = context;
                     context.getBrowserActions().performAction(new Callable<Void>() {
                         @Override
@@ -165,12 +156,10 @@ public class GrapheneContextImpl extends ExtendedGrapheneContext {
                         }
                     });
                     LAZY_CONTEXTS.get().put(qualifier, context);
-                    System.out.format("New Lazy Context for Qualifier(%s) is %s\n", qualifier, context);
                 } catch (Exception e) {
                     throw new IllegalStateException("Can't create a lazy context for " + qualifier.getName() + " qualifier.", e);
                 }
             }
-            System.out.format("Context for Qualifier(%s) is %s\n", qualifier, context);
             return context;
         }
 
@@ -187,8 +176,6 @@ public class GrapheneContextImpl extends ExtendedGrapheneContext {
         public GrapheneContext setContextFor(GrapheneConfiguration configuration, WebDriver driver, Class<?> qualifier) {
             GrapheneContext grapheneContext = new GrapheneContextImpl(configuration, driver, qualifier);
             ALL_CONTEXTS.get().put(qualifier, grapheneContext);
-            System.out.format("New Global Context for Qualifier(%s) is %s - id %s\n",
-                    qualifier, grapheneContext, System.identityHashCode(grapheneContext));
             return getContextFor(qualifier);
         }
 
@@ -211,17 +198,9 @@ public class GrapheneContextImpl extends ExtendedGrapheneContext {
                         });
                 } catch (Exception ignored) {
                 }
-                GrapheneContextImpl.LazyContext oldCtx = LAZY_CONTEXTS.get().remove(qualifier);
-                System.out.format("Removed Lazy Context for Qualifier(%s) %s\n", qualifier, oldCtx);
-                if (LAZY_CONTEXTS.get().get(qualifier) != null) {
-                    throw new IllegalStateException("should be null");
-                }
+                LAZY_CONTEXTS.get().remove(qualifier);
             }
-            GrapheneContext oldCtx = ALL_CONTEXTS.get().remove(qualifier);
-            System.out.format("Removed Global Context for Qualifier(%s) %s\n", qualifier, oldCtx);
-            if (ALL_CONTEXTS.get().get(qualifier) != null) {
-                throw new IllegalStateException("should be null");
-            }
+            ALL_CONTEXTS.get().remove(qualifier);
         }
     }
 
@@ -292,22 +271,19 @@ public class GrapheneContextImpl extends ExtendedGrapheneContext {
         }
 
         @Override
-        public WebDriver getWebDriver(boolean dontProxy, Class<?>... interfaces) {
+        public WebDriver getWebDriver(Class<?>... interfaces) {
             GrapheneContext context = getContext(false);
             if (context == null) {
                 return GrapheneProxy.getProxyForHandler(handler, WebDriver.class, interfaces);
-            } else if (dontProxy) {
-                return context.getWebDriver(dontProxy);
-            } else if (GrapheneProxyUtil.isProxy(context.getWebDriver(dontProxy)) ||
-                    context.getWebDriver(dontProxy).getClass().getName().contains("$MockitoMock$")) {
-                Class<?> superclass = context.getWebDriver(dontProxy).getClass().getSuperclass();
+            } else if (GrapheneProxyUtil.isProxy(context.getWebDriver())) {
+                Class<?> superclass = context.getWebDriver().getClass().getSuperclass();
                 if (superclass != null && !GrapheneProxyUtil.isProxy(superclass) && WebDriver.class.isAssignableFrom(superclass)) {
-                    return GrapheneProxy.getProxyForHandler(handler, context.getWebDriver(dontProxy).getClass().getSuperclass(), interfaces);
+                    return GrapheneProxy.getProxyForHandler(handler, context.getWebDriver().getClass().getSuperclass(), interfaces);
                 } else {
                     return GrapheneProxy.getProxyForHandler(handler, WebDriver.class, interfaces);
                 }
             } else {
-                return GrapheneProxy.getProxyForHandler(handler, context.getWebDriver(dontProxy).getClass(), interfaces);
+                return GrapheneProxy.getProxyForHandler(handler, context.getWebDriver().getClass(), interfaces);
             }
         }
 
@@ -331,12 +307,8 @@ public class GrapheneContextImpl extends ExtendedGrapheneContext {
         protected GrapheneProxy.FutureTarget getFutureTarget() {
             return new GrapheneProxy.FutureTarget() {
                 @Override
-                public Object getTarget(boolean dontProxy) {
-                    GrapheneContext context = GrapheneProxyUtil.notProxy(getContext(true), dontProxy);
-                    if (dontProxy == true) {
-                        System.out.println("Hello");
-                    }
-                    return GrapheneProxyUtil.notProxy(context.getWebDriver(dontProxy), dontProxy);
+                public Object getTarget() {
+                    return getContext(true).getWebDriver();
                 }
             };
         }

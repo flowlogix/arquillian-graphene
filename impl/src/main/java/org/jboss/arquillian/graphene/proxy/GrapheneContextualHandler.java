@@ -44,7 +44,6 @@ import org.jboss.arquillian.graphene.intercept.InterceptorBuilder;
 import org.jboss.arquillian.graphene.intercept.InterceptorPrecedenceComparator;
 import org.jboss.arquillian.graphene.proxy.GrapheneProxy.FutureTarget;
 import org.openqa.selenium.WebElement;
-
 import org.openqa.selenium.WrapsElement;
 
 /**
@@ -125,7 +124,7 @@ public class GrapheneContextualHandler extends GrapheneProxyHandler {
             if (!method.isAccessible()) {
                 method.setAccessible(true);
             }
-            Object target = getTarget(false);
+            Object target = getTarget();
             if (target instanceof GrapheneProxyInstance) {
                 return ((GrapheneProxyInstance) target).unwrap();
             }
@@ -133,7 +132,7 @@ public class GrapheneContextualHandler extends GrapheneProxyHandler {
         }
         // handle the GrapheneProxyInstance's method unwrap
         if (method.equals(GrapheneProxyInstance.class.getMethod("unwrap"))) {
-            Object target = getTarget(false);
+            Object target = getTarget();
             if (target instanceof GrapheneProxyInstance) {
                 return ((GrapheneProxyInstance) target).unwrap();
             }
@@ -159,7 +158,7 @@ public class GrapheneContextualHandler extends GrapheneProxyHandler {
         // handle GrapheneProxyInstance's method copy
         if (method.equals(GrapheneProxyInstance.class.getMethod("copy"))) {
             GrapheneProxyInstance clone;
-            clone = (GrapheneProxyInstance) GrapheneProxy.getProxyForTarget(context, getTarget(true));
+            clone = (GrapheneProxyInstance) GrapheneProxy.getProxyForTarget(context, getTarget());
             for (Interceptor interceptor : getSortedInterceptorsByPrecedence()) {
                 clone.registerInterceptor(interceptor);
             }
@@ -178,7 +177,7 @@ public class GrapheneContextualHandler extends GrapheneProxyHandler {
 
             @Override
             public Object invoke() throws Throwable {
-                Object result = invokeReal(getTarget(true), method, args);
+                Object result = invokeReal(getTarget(), method, args);
                 if (result == null) {
                     return null;
                 }
@@ -226,8 +225,8 @@ public class GrapheneContextualHandler extends GrapheneProxyHandler {
             }
 
             @Override
-            public Object getTarget(boolean dontProxy) {
-                return GrapheneContextualHandler.this.getTarget(dontProxy);
+            public Object getTarget() {
+                return GrapheneContextualHandler.this.getTarget();
             }
 
             @Override

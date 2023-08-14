@@ -35,7 +35,6 @@ import java.util.Set;
  * @author Lukas Fryc
  */
 public final class GrapheneProxyUtil {
-
     /**
      * Transitively obtains the interfaces which are implemented by given classes.
      *
@@ -120,15 +119,5 @@ public final class GrapheneProxyUtil {
 
     public static boolean isProxy(Object target) {
         return target != null && isProxy(target.getClass());
-    }
-
-    public static <TT> TT notProxy(TT object, boolean notProxy) {
-        if (false && notProxy) {
-            if (isProxy(object)) {
-                throw new IllegalStateException(String.format("Proxy where there shouldn't be: %s@%s]",
-                        object.getClass(), System.identityHashCode(object)));
-            }
-        }
-        return object;
     }
 }

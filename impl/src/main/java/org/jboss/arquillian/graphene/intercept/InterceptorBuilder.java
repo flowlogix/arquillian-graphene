@@ -77,7 +77,7 @@ public class InterceptorBuilder {
      * @return proxy for executing methods which shoyld be intercepted by given interceptor
      */
     public <T> T interceptInvocation(Class<T> type, final Interceptor interceptor) {
-        return (T) ClassImposterizer.imposterise(new InterceptorImpl(this, interceptor), type);
+        return (T) ClassImposterizer.INSTANCE.imposterise(new InterceptorImpl(this, interceptor), type);
     }
 
     private void registerMethodInterceptor(Method method, Interceptor interceptor) {
@@ -124,8 +124,8 @@ public class InterceptorBuilder {
                             }
 
                             @Override
-                            public Object getTarget(boolean dontProxy) {
-                                return originalContext.getTarget(dontProxy);
+                            public Object getTarget() {
+                                return originalContext.getTarget();
                             }
 
                             @Override

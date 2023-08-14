@@ -30,7 +30,6 @@ import org.jboss.arquillian.core.spi.LoadableExtension.ExtensionBuilder;
 import org.jboss.arquillian.graphene.context.GrapheneContext;
 import org.jboss.arquillian.graphene.proxy.GrapheneProxy;
 import org.jboss.arquillian.graphene.proxy.GrapheneProxyHandler;
-import org.jboss.arquillian.graphene.proxy.GrapheneProxyUtil;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.arquillian.test.spi.enricher.resource.ResourceProvider;
 import org.openqa.selenium.JavascriptExecutor;
@@ -175,7 +174,7 @@ public abstract class SeleniumResourceProvider implements ResourceProvider {
         public Object lookup(ArquillianResource resource, Annotation... qualifiers) {
             GrapheneContext context = GrapheneContext.getContextFor(ReflectionHelper.getQualifier(qualifiers));
             try {
-                return context.getWebDriver(false, Class.forName(getReturnType()));
+                return context.getWebDriver(Class.forName(getReturnType()));
             } catch (ClassNotFoundException ex) {
                 //the external users:
                 //  - does not have any chance to build a test with classes which are not added on classpath
@@ -204,9 +203,9 @@ public abstract class SeleniumResourceProvider implements ResourceProvider {
         protected <BASE> BASE base(final Annotation[] annotations) {
             final GrapheneProxy.FutureTarget futureTarget = new GrapheneProxy.FutureTarget() {
                 @Override
-                public Object getTarget(boolean dontProxy) {
+                public Object getTarget() {
                     GrapheneContext context = GrapheneContext.getContextFor(ReflectionHelper.getQualifier(annotations));
-                    return GrapheneProxyUtil.notProxy(context.getWebDriver(dontProxy, mediatorType), dontProxy);
+                    return context.getWebDriver(mediatorType);
                 }
             };
 
@@ -218,7 +217,7 @@ public abstract class SeleniumResourceProvider implements ResourceProvider {
 
                         @Override
                         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                            Object mediatorObject = mediatorMethod.invoke(getTarget(true), mediatorArgs);
+                            Object mediatorObject = mediatorMethod.invoke(getTarget(), mediatorArgs);
                             return method.invoke(mediatorObject, args);
                         }
                     };

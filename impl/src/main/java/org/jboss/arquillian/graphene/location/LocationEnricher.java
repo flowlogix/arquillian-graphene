@@ -87,7 +87,7 @@ public class LocationEnricher implements TestEnricher {
     public <T> T goTo(Class<T> pageObject, Class<?> browserQualifier) {
         T result = null;
         GrapheneContext grapheneContext = GrapheneContext.getContextFor(browserQualifier);
-        WebDriver browser = grapheneContext.getWebDriver(false);
+        WebDriver browser = grapheneContext.getWebDriver();
         try {
             result = PageObjectEnricher.setupPage(grapheneContext, browser, pageObject);
         } catch (Exception e) {
