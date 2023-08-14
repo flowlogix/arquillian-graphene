@@ -21,8 +21,6 @@
  */
 package org.jboss.arquillian.graphene.proxy;
 
-import org.jboss.arquillian.graphene.bytebuddy.MethodInterceptor;
-
 /**
  * <p>
  * Interface for implementers of interception.
