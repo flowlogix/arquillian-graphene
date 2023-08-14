@@ -36,7 +36,7 @@ import org.jboss.arquillian.graphene.bytebuddy.MethodInterceptor;
  * @author <a href="mailto:jpapouse@redhat.com">Jan Papousek</a>
  * @author <a href="mailto:jhuska@redhat.com">Juraj Huska</a>
  */
-public interface Interceptor extends MethodInterceptor {
+public interface Interceptor {
 
     /**
      * When processing custom logic must satisfy, that at least once will be called method
