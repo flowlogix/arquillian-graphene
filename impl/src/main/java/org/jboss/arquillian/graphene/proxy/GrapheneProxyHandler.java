@@ -45,8 +45,7 @@ import org.jboss.arquillian.graphene.proxy.GrapheneProxy.FutureTarget;
  *
  * @author Lukas Fryc
  */
-public abstract class GrapheneProxyHandler implements InvocationHandler, MethodInterceptor {
-
+public abstract class GrapheneProxyHandler implements MethodInterceptor, InvocationHandler {
     private Object target;
     private FutureTarget future;
 
@@ -58,9 +57,6 @@ public abstract class GrapheneProxyHandler implements InvocationHandler, MethodI
      */
     public GrapheneProxyHandler(Object target) {
         this.target = target;
-//        if (GrapheneProxyUtil.isProxy(target)) {
-//            throw new IllegalStateException("target is a proxy: " + target);
-//        }
     }
 
     /**
