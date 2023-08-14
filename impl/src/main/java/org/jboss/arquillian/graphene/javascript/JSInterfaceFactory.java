@@ -23,6 +23,7 @@ package org.jboss.arquillian.graphene.javascript;
 
 import java.lang.reflect.Modifier;
 
+import org.jboss.arquillian.graphene.context.ExtendedGrapheneContext;
 import org.jboss.arquillian.graphene.context.GrapheneContext;
 
 public class JSInterfaceFactory<T> {
@@ -43,6 +44,6 @@ public class JSInterfaceFactory<T> {
     @SuppressWarnings("unchecked")
     public T instantiate() {
         Class<?> jsInterface = handler.getTarget().getInterface();
-        return (T) ClassImposterizer.INSTANCE.imposterise(handler, jsInterface);
+        return (T) ClassImposterizer.imposterise(handler, jsInterface);
     }
 }

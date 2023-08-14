@@ -50,7 +50,7 @@ public class InFrameInterceptor implements Interceptor {
 
     @Override
     public Object intercept(InvocationContext context) throws Throwable {
-        WebDriver browser = context.getGrapheneContext().getWebDriver();
+        WebDriver browser = context.getGrapheneContext().getWebDriver(false);
         if (indexOfFrame != -1) {
             browser.switchTo().frame(indexOfFrame);
         } else if (nameOrIdOfFrame != null) {

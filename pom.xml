@@ -31,23 +31,18 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <useReleaseProfile>true</useReleaseProfile>
 
-        <!-- jboss-parent override -->
-        <maven.compiler.argument.target>1.8</maven.compiler.argument.target>
-        <maven.compiler.argument.source>1.8</maven.compiler.argument.source>
-
         <!-- Arquillian -->
         <version.arquillian.core>1.7.0.Final</version.arquillian.core>
         <version.arquillian.drone>3.0.0-SNAPSHOT</version.arquillian.drone>
 
         <!-- Runtime dependencies -->
         <version.asm>9.5</version.asm>
-        <version.cglib>3.3.0</version.cglib>
         <version.objenesis>3.3</version.objenesis>
 
         <!-- Tests -->
         <version.junit>4.13.2</version.junit>
         <version.hamcrest>1.3</version.hamcrest>
-        <version.mockito>1.9.5</version.mockito>
+        <version.mockito>5.4.0</version.mockito>
     </properties>
 
     <licenses>
@@ -111,9 +106,9 @@
                 <version>${version.asm}</version>
             </dependency>
             <dependency>
-                <groupId>cglib</groupId>
-                <artifactId>cglib</artifactId>
-                <version>${version.cglib}</version>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>1.14.5</version>
             </dependency>
             <dependency>
                 <groupId>org.objenesis</groupId>
@@ -134,8 +129,13 @@
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
-                <artifactId>mockito-all</artifactId>
+                <artifactId>mockito-core</artifactId>
                 <version>${version.mockito}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-inline</artifactId>
+                <version>5.2.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -156,18 +156,14 @@
             <plugins>
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <configuration>
-                        <source>1.8</source>
-                        <target>1.8</target>
-                        <compilerVersion>1.8</compilerVersion>
+                    <version>3.11.0</version>
+                    <configuration combine.self="override">
+                        <release>11</release>
                         <showDeprecation>false</showDeprecation>
                         <showWarnings>true</showWarnings>
-                        <optimize>true</optimize>
-                        <fork>true</fork>
-                        <compilerArguments>
-                            <source>1.8</source>
-                            <target>1.8</target>
-                        </compilerArguments>
+                        <compilerArgs>
+                            <arg>-Xlint:unchecked</arg>
+                        </compilerArgs>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -211,6 +207,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>animal-sniffer-maven-plugin</artifactId>
+                    <version>1.23</version>
                     <executions>
                         <execution>
                             <id>signature-check</id>
@@ -231,7 +228,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.22.2</version>
+                    <version>3.1.2</version>
                 </plugin>
                 <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
                 <plugin>

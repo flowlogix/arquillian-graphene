@@ -23,8 +23,9 @@ package org.jboss.arquillian.graphene.proxy;
 
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
-
-import net.sf.cglib.proxy.Enhancer;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.jboss.arquillian.graphene.context.GrapheneContext;
 
@@ -34,7 +35,6 @@ import org.jboss.arquillian.graphene.context.GrapheneContext;
  * @author Lukas Fryc
  */
 public final class GrapheneProxy {
-
     /**
      * Returns whether given <code>object</code> is instance of context proxy.
      *
@@ -150,12 +150,17 @@ public final class GrapheneProxy {
     static <T> T createProxy(GrapheneProxyHandler interceptor, Class<T> baseType, Class<?>... additionalInterfaces) {
 
         if (baseType != null) {
-            while (Enhancer.isEnhanced(baseType)) {
+            while (GrapheneProxyUtil.isProxy(baseType)) {
                 baseType = (Class<T>) baseType.getSuperclass();
             }
         }
 
         Class<?>[] ancillaryTypes = GrapheneProxyUtil.concatClasses(additionalInterfaces, GrapheneProxyInstance.class);
+        for (Class<?> clz : ancillaryTypes) {
+            if (GrapheneProxyUtil.isProxy(clz)) {
+                throw new IllegalStateException("already proxy: " + clz);
+            }
+        }
 
         T result;
 
@@ -163,9 +168,17 @@ public final class GrapheneProxy {
             if (baseType != null) {
                 ancillaryTypes = GrapheneProxyUtil.concatClasses(ancillaryTypes, baseType);
             }
+//            System.out.println("Creating proxy(java) for " + baseType);
+            if (baseType == null) {
+                System.out.println("null proxy");
+            }
             result = (T) Proxy.newProxyInstance(GrapheneProxy.class.getClassLoader(), ancillaryTypes, interceptor);
         } else {
-            result = (T) ClassImposterizer.INSTANCE.imposterise(interceptor, baseType, ancillaryTypes);
+//            System.out.println("Creating proxy(bytebuddy) for " + baseType);
+            if (baseType.getName().startsWith("org.openqa.selenium.WebDriver")) {
+//                System.out.println("WebDriver - Bad Proxy");
+            }
+            result = (T) ClassImposterizer.imposterise(interceptor, baseType, ancillaryTypes);
         }
 
         return result;
@@ -176,7 +189,7 @@ public final class GrapheneProxy {
      */
     public interface FutureTarget {
 
-        Object getTarget();
+        Object getTarget(boolean dontProxy);
     }
 
     public static class ConstantFutureTarget implements FutureTarget {
@@ -188,9 +201,8 @@ public final class GrapheneProxy {
         }
 
         @Override
-        public Object getTarget() {
-            return target;
+        public Object getTarget(boolean dontProxy) {
+            return GrapheneProxyUtil.notProxy(target, dontProxy);
         }
-
     }
 }

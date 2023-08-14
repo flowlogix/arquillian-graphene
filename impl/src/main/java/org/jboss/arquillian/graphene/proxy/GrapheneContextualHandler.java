@@ -30,7 +30,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import net.bytebuddy.implementation.bind.annotation.AllArguments;
+import net.bytebuddy.implementation.bind.annotation.FieldValue;
+import net.bytebuddy.implementation.bind.annotation.Origin;
+import net.bytebuddy.implementation.bind.annotation.RuntimeType;
+import net.bytebuddy.implementation.bind.annotation.This;
 import org.jboss.arquillian.graphene.GrapheneElement;
+import org.jboss.arquillian.graphene.cglib.MethodInterceptor;
 import org.jboss.arquillian.graphene.context.GrapheneContext;
 import org.jboss.arquillian.graphene.context.GrapheneContextImpl;
 import org.jboss.arquillian.graphene.enricher.WrapsElementInterceptor;
@@ -39,8 +45,6 @@ import org.jboss.arquillian.graphene.intercept.InterceptorPrecedenceComparator;
 import org.jboss.arquillian.graphene.proxy.GrapheneProxy.FutureTarget;
 import org.openqa.selenium.WebElement;
 
-import net.sf.cglib.proxy.MethodInterceptor;
-import net.sf.cglib.proxy.MethodProxy;
 import org.openqa.selenium.WrapsElement;
 
 /**
@@ -81,6 +85,14 @@ public class GrapheneContextualHandler extends GrapheneProxyHandler {
         return handler;
     }
 
+    @RuntimeType
+    public static Object intercept(@This Object self,
+                                   @FieldValue("__interceptor") MethodInterceptor interceptor,
+                                   @Origin Method method,
+                                   @AllArguments Object[] args) throws Throwable {
+        return GrapheneProxyHandler.intercept(self, interceptor, method, args);
+    }
+
     /**
      * Returns invocation handler which wraps the target for future computation.
      *
@@ -113,7 +125,7 @@ public class GrapheneContextualHandler extends GrapheneProxyHandler {
             if (!method.isAccessible()) {
                 method.setAccessible(true);
             }
-            Object target = getTarget();
+            Object target = getTarget(false);
             if (target instanceof GrapheneProxyInstance) {
                 return ((GrapheneProxyInstance) target).unwrap();
             }
@@ -121,7 +133,7 @@ public class GrapheneContextualHandler extends GrapheneProxyHandler {
         }
         // handle the GrapheneProxyInstance's method unwrap
         if (method.equals(GrapheneProxyInstance.class.getMethod("unwrap"))) {
-            Object target = getTarget();
+            Object target = getTarget(false);
             if (target instanceof GrapheneProxyInstance) {
                 return ((GrapheneProxyInstance) target).unwrap();
             }
@@ -147,7 +159,7 @@ public class GrapheneContextualHandler extends GrapheneProxyHandler {
         // handle GrapheneProxyInstance's method copy
         if (method.equals(GrapheneProxyInstance.class.getMethod("copy"))) {
             GrapheneProxyInstance clone;
-            clone = (GrapheneProxyInstance) GrapheneProxy.getProxyForTarget(context, getTarget());
+            clone = (GrapheneProxyInstance) GrapheneProxy.getProxyForTarget(context, getTarget(true));
             for (Interceptor interceptor : getSortedInterceptorsByPrecedence()) {
                 clone.registerInterceptor(interceptor);
             }
@@ -166,7 +178,7 @@ public class GrapheneContextualHandler extends GrapheneProxyHandler {
 
             @Override
             public Object invoke() throws Throwable {
-                Object result = invokeReal(getTarget(), method, args);
+                Object result = invokeReal(getTarget(true), method, args);
                 if (result == null) {
                     return null;
                 }
@@ -214,8 +226,8 @@ public class GrapheneContextualHandler extends GrapheneProxyHandler {
             }
 
             @Override
-            public Object getTarget() {
-                return GrapheneContextualHandler.this.getTarget();
+            public Object getTarget(boolean dontProxy) {
+                return GrapheneContextualHandler.this.getTarget(dontProxy);
             }
 
             @Override
@@ -253,14 +265,6 @@ public class GrapheneContextualHandler extends GrapheneProxyHandler {
         } else {
             return finalInvocationContext.invoke();
         }
-    }
-
-    /**
-     * Delegates to {@link #invoke(Object, Method, Object[])} to serve as {@link MethodInterceptor}.
-     */
-    @Override
-    public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-        return invoke(obj, method, args);
     }
 
     /**

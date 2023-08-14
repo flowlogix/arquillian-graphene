@@ -67,7 +67,7 @@ public class WebElementWrapperEnricher extends AbstractSearchContextEnricher {
                         .getGrapheneContext();
                     if (grapheneContext == null) {
                         grapheneContext = GrapheneContext.getContextFor(ReflectionHelper.getQualifier(field.getAnnotations()));
-                        localSearchContext = grapheneContext.getWebDriver(SearchContext.class);
+                        localSearchContext = grapheneContext.getWebDriver(false, SearchContext.class);
                     } else {
                         localSearchContext = searchContext;
                     }
@@ -94,7 +94,7 @@ public class WebElementWrapperEnricher extends AbstractSearchContextEnricher {
                         .getGrapheneContext();
                     if (grapheneContext == null) {
                         grapheneContext = GrapheneContext.getContextFor(ReflectionHelper.getQualifier(field.getAnnotations()));
-                        localSearchContext = grapheneContext.getWebDriver(SearchContext.class);
+                        localSearchContext = grapheneContext.getWebDriver(false, SearchContext.class);
                     } else {
                         localSearchContext = searchContext;
                     }
@@ -123,7 +123,7 @@ public class WebElementWrapperEnricher extends AbstractSearchContextEnricher {
 
     protected <T> T createWrapper(GrapheneContext grapheneContext, final Class<T> type, final WebElement element) {
         T wrapper = GrapheneProxy.getProxyForHandler(
-                GrapheneContextualHandler.forFuture(grapheneContext, () -> {
+                GrapheneContextualHandler.forFuture(grapheneContext, dontProxy -> {
                     try {
                         return instantiate(type, element);
                     } catch (Exception e) {
@@ -136,7 +136,7 @@ public class WebElementWrapperEnricher extends AbstractSearchContextEnricher {
     @SuppressWarnings("unchecked")
     protected <T> List<T> createWrappers(GrapheneContext grapheneContext, final Class<T> type, final List<WebElement> elements) {
         List<T> wrapper = GrapheneProxy.getProxyForHandler(
-                GrapheneContextualHandler.forFuture(grapheneContext, () -> {
+                GrapheneContextualHandler.forFuture(grapheneContext, dontProxy -> {
                     try {
                         List<T> target = new ArrayList<T>();
                         for (WebElement element : elements) {

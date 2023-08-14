@@ -21,6 +21,8 @@
  */
 package org.jboss.arquillian.graphene.proxy;
 
+import org.jboss.arquillian.graphene.cglib.MethodInterceptor;
+
 /**
  * <p>
  * Interface for implementers of interception.
@@ -34,7 +36,7 @@ package org.jboss.arquillian.graphene.proxy;
  * @author <a href="mailto:jpapouse@redhat.com">Jan Papousek</a>
  * @author <a href="mailto:jhuska@redhat.com">Juraj Huska</a>
  */
-public interface Interceptor {
+public interface Interceptor extends MethodInterceptor {
 
     /**
      * When processing custom logic must satisfy, that at least once will be called method
@@ -57,5 +59,4 @@ public interface Interceptor {
      * @return
      */
     int getPrecedence();
-
 }

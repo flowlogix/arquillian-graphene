@@ -90,7 +90,7 @@ public class DefaultGrapheneRuntime extends GrapheneRuntime {
     }
 
     public WebDriverWait<Void> waitAjax() {
-        return waitAjax(context().getWebDriver());
+        return waitAjax(context().getWebDriver(false));
     }
 
     public WebDriverWait<Void> waitAjax(WebDriver driver) {
@@ -98,7 +98,7 @@ public class DefaultGrapheneRuntime extends GrapheneRuntime {
     }
 
     public WebDriverWait<Void> waitGui() {
-        return waitGui(context().getWebDriver());
+        return waitGui(context().getWebDriver(false));
     }
 
     public WebDriverWait<Void> waitGui(WebDriver driver) {
@@ -106,7 +106,7 @@ public class DefaultGrapheneRuntime extends GrapheneRuntime {
     }
 
     public WebDriverWait<Void> waitModel() {
-        return waitModel(context().getWebDriver());
+        return waitModel(context().getWebDriver(false));
     }
 
     public WebDriverWait<Void> waitModel(WebDriver driver) {
@@ -128,17 +128,17 @@ public class DefaultGrapheneRuntime extends GrapheneRuntime {
 
     @Override
     public void doubleClick(WebElement element) {
-        new Actions(context().getWebDriver()).doubleClick(element).perform();
+        new Actions(context().getWebDriver(false)).doubleClick(element).perform();
     }
 
     @Override
     public void click(WebElement element) {
-        new Actions(context().getWebDriver()).click(element).perform();
+        new Actions(context().getWebDriver(false)).click(element).perform();
     }
 
     @Override
     protected void writeIntoElement(WebElement element, String text) {
-        new Actions(context().getWebDriver()).moveToElement(element).click().sendKeys(text).perform();
+        new Actions(context().getWebDriver(false)).moveToElement(element).click().sendKeys(text).perform();
     }
 
     private RequestGuardFactory getRequestGuardFactoryFor(Object target) {

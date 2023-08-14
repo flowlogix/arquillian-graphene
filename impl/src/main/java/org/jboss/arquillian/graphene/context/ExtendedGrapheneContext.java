@@ -21,13 +21,21 @@
  */
 package org.jboss.arquillian.graphene.context;
 
+import org.jboss.arquillian.graphene.cglib.ClassImposterizer;
 import org.jboss.arquillian.graphene.page.extension.PageExtensionInstallatorProvider;
 import org.jboss.arquillian.graphene.page.extension.PageExtensionRegistry;
 
 public abstract class ExtendedGrapheneContext extends GrapheneContext {
 
+    public static ExtendedGrapheneContext lastContext() {
+        return (ExtendedGrapheneContext) GrapheneContext.lastContext();
+    }
+
     public abstract PageExtensionInstallatorProvider getPageExtensionInstallatorProvider();
 
     public abstract PageExtensionRegistry getPageExtensionRegistry();
+
+
+    public abstract ClassImposterizer getImposterizerInstance();
 
 }

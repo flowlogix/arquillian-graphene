@@ -99,8 +99,8 @@ public class InvocationContextImpl implements InvocationContext {
     }
 
     @Override
-    public Object getTarget() {
-        return target == null ? following.getTarget() : target;
+    public Object getTarget(boolean dontProxy) {
+        return target == null ? following.getTarget(dontProxy) : GrapheneProxyUtil.notProxy(target, dontProxy);
     }
 
     @Override

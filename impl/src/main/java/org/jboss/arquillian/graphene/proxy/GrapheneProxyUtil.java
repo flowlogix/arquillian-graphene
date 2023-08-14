@@ -106,11 +106,11 @@ public final class GrapheneProxyUtil {
         if (clazz.equals(Object.class)) {
             return false;
         }
-        if (net.sf.cglib.proxy.Proxy.isProxyClass(clazz) || Proxy.isProxyClass(clazz)) {
+        if (clazz.getName().endsWith(ClassImposterizer.TAG) || Proxy.isProxyClass(clazz)) {
             return true;
         } else {
             for (Class<?> interfaze: clazz.getInterfaces()) {
-                if (interfaze.getName().endsWith(".cglib.proxy.Factory")) {
+                if (interfaze.getName().endsWith(ClassImposterizer.TAG)) {
                     return true;
                 }
             }
@@ -119,7 +119,16 @@ public final class GrapheneProxyUtil {
     }
 
     public static boolean isProxy(Object target) {
-        return isProxy(target.getClass());
+        return target != null && isProxy(target.getClass());
+    }
 
+    public static <TT> TT notProxy(TT object, boolean notProxy) {
+        if (false && notProxy) {
+            if (isProxy(object)) {
+                throw new IllegalStateException(String.format("Proxy where there shouldn't be: %s@%s]",
+                        object.getClass(), System.identityHashCode(object)));
+            }
+        }
+        return object;
     }
 }

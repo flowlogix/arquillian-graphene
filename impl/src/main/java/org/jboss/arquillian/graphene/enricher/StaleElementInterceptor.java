@@ -40,7 +40,7 @@ public class StaleElementInterceptor implements Interceptor {
         final AtomicReference<Throwable> failure = new AtomicReference<Throwable>();
         final AtomicReference<Throwable> staleness = new AtomicReference<Throwable>();
         try {
-            waitGui(context.getGrapheneContext().getWebDriver()).until(new Function<WebDriver, Boolean>() {
+            waitGui(context.getGrapheneContext().getWebDriver(false)).until(new Function<WebDriver, Boolean>() {
                 @Override
                 public Boolean apply(WebDriver driver) {
                     try {

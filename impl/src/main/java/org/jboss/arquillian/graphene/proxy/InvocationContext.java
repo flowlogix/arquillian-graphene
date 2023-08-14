@@ -51,7 +51,7 @@ public interface InvocationContext extends GrapheneProxy.FutureTarget {
      * @return the target object of the method invocation
      */
     @Override
-    Object getTarget();
+    Object getTarget(boolean dontProxy);
 
     Object getProxy();
 

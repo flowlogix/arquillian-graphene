@@ -21,12 +21,12 @@
  */
 package org.jboss.arquillian.graphene.enricher;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import org.junit.Test;
@@ -38,13 +38,14 @@ public class TestWebElementLazyEvaluation extends AbstractGrapheneEnricherTest {
 
     @Test
     public void when_WebElement_is_injected_then_it_is_first_evaluated_at_first_interaction() {
+        System.out.println("Drone(first): " + System.identityHashCode(browser));
         WebElement element = mock(WebElement.class);
         when(browser.findElement(any(By.class))).thenReturn(element);
 
         TPageFragment fragment = new TPageFragment();
         getGrapheneEnricher().enrich(fragment);
 
-        verifyZeroInteractions(browser, element);
+        verifyNoInteractions(browser, element);
 
         fragment.getElement().click();
         fragment.getElement().click();
@@ -54,10 +55,12 @@ public class TestWebElementLazyEvaluation extends AbstractGrapheneEnricherTest {
         verify(element, times(2)).click();
 
         verifyNoMoreInteractions(browser, element);
+        System.out.println("DONE!: " + System.identityHashCode(browser));
     }
 
     @Test
     public void when_page_fragment_is_injected_then_searching_for_its_siblings_is_done_for_each_invocation() {
+        System.out.println("Drone(each): " + System.identityHashCode(browser));
         WebElement rootElement = mock(WebElement.class);
         WebElement element = mock(WebElement.class);
         when(browser.findElement(any(By.class))).thenReturn(rootElement);
@@ -66,7 +69,7 @@ public class TestWebElementLazyEvaluation extends AbstractGrapheneEnricherTest {
         TPage page = new TPage();
         getGrapheneEnricher().enrich(page);
 
-        verifyZeroInteractions(browser, element);
+        verifyNoInteractions(browser, element);
 
         page.getFragment().getElement().click();
         page.getFragment().getElement().click();
@@ -78,6 +81,7 @@ public class TestWebElementLazyEvaluation extends AbstractGrapheneEnricherTest {
         verify(element, times(3)).click();
 
         verifyNoMoreInteractions(browser, element);
+        System.out.println("DONE!!: " + System.identityHashCode(browser));
     }
 
     public static class TPage {
