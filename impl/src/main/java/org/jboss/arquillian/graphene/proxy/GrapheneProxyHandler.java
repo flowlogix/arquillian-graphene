@@ -30,7 +30,7 @@ import net.bytebuddy.implementation.bind.annotation.FieldValue;
 import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.implementation.bind.annotation.This;
-import org.jboss.arquillian.graphene.cglib.MethodInterceptor;
+import org.jboss.arquillian.graphene.bytebuddy.MethodInterceptor;
 import org.jboss.arquillian.graphene.proxy.GrapheneProxy.FutureTarget;
 
 /**

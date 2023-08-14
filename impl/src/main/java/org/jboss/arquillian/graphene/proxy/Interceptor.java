@@ -21,7 +21,7 @@
  */
 package org.jboss.arquillian.graphene.proxy;
 
-import org.jboss.arquillian.graphene.cglib.MethodInterceptor;
+import org.jboss.arquillian.graphene.bytebuddy.MethodInterceptor;
 
 /**
  * <p>

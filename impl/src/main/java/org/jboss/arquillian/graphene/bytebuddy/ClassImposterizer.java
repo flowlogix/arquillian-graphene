@@ -36,7 +36,7 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
 WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 DAMAGE.
 */
-package org.jboss.arquillian.graphene.cglib;
+package org.jboss.arquillian.graphene.bytebuddy;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

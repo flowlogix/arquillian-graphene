@@ -23,7 +23,7 @@ package org.jboss.arquillian.graphene.intercept;
 
 import net.bytebuddy.implementation.bind.annotation.Empty;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
-import org.jboss.arquillian.graphene.cglib.MethodInterceptor;
+import org.jboss.arquillian.graphene.bytebuddy.MethodInterceptor;
 
 /**
  * Utility class with helper methods for building interceptors using {@link InterceptorBuilder}.
