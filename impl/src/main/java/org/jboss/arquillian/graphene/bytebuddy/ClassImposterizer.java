@@ -160,7 +160,7 @@ public class ClassImposterizer {
                 .intercept(MethodDelegation.to(interceptorType)).make();
         Class<?> proxyType = unloadedType.load(mockedType.getClassLoader()).getLoaded();
         try {
-            var interceptorField = proxyType.getDeclaredField("__interceptor");
+            Field interceptorField = proxyType.getDeclaredField("__interceptor");
             interceptorField.setAccessible(true);
             interceptorFields.put(proxyType, interceptorField);
         } catch (NoSuchFieldException e) {

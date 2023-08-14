@@ -29,6 +29,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maxPermSizeArg/>
+        <surefire.argLine/>
         <useReleaseProfile>true</useReleaseProfile>
 
         <!-- Arquillian -->
@@ -157,14 +159,6 @@
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.11.0</version>
-                    <configuration combine.self="override">
-                        <release>11</release>
-                        <showDeprecation>false</showDeprecation>
-                        <showWarnings>true</showWarnings>
-                        <compilerArgs>
-                            <arg>-Xlint:unchecked</arg>
-                        </compilerArgs>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -229,6 +223,12 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>3.1.2</version>
+                    <configuration>
+                        <argLine>${surefire.argLine}</argLine>
+                        <systemPropertyVariables>
+                            <maxPermSizeArg>${maxPermSizeArg}</maxPermSizeArg>
+                        </systemPropertyVariables>
+                    </configuration>
                 </plugin>
                 <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
                 <plugin>
@@ -271,7 +271,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-report-plugin</artifactId>
-                    <version>2.22.1</version>
+                    <version>3.1.2</version>
                     <configuration>
                         <outputDirectory>${project.build.directory}/surefire-reports</outputDirectory>
                     </configuration>
@@ -302,8 +302,11 @@
                         <version>true</version>
                         <author>true</author>
                         <keywords>true</keywords>
-                        <additionalparam>-sourceclasspath
-                            ${project.build.outputDirectory}</additionalparam>
+                        <additionalJOptions>
+                            <additionalJOption>
+                                -sourceclasspath ${project.build.outputDirectory}
+                            </additionalJOption>
+                        </additionalJOptions>
                         <javadocDirectory>${project.parent.parent.basedir}/javadoc</javadocDirectory>
                     </configuration>
                     <executions>
@@ -318,4 +321,69 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <profiles>
+        <profile>
+            <id>jdk8</id>
+            <activation>
+                <jdk>1.8</jdk>
+            </activation>
+            <properties>
+                <maxPermSizeArg>-XX:MaxPermSize=512m</maxPermSizeArg>
+                <!-- jboss-parent override -->
+                <maven.compiler.argument.target>1.8</maven.compiler.argument.target>
+                <maven.compiler.argument.source>1.8</maven.compiler.argument.source>
+
+<!--            Last mockito that supports Java 8 -->
+                <version.mockito>4.11.0</version.mockito>
+            </properties>
+
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <version>3.11.0</version>
+                            <configuration>
+                                <showDeprecation>false</showDeprecation>
+                                <showWarnings>true</showWarnings>
+                                <compilerArgs>
+                                    <arg>-Xlint:unchecked</arg>
+                                    <arg>-Xlint:deprecation</arg>
+                                </compilerArgs>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+
+        <profile>
+            <id>jdk9plus</id>
+            <activation>
+                <jdk>[9,)</jdk>
+            </activation>
+            <properties>
+                <!-- Prevent warnings from surefire plugin every time tests are executed -->
+                <surefire.argLine>-XX:+IgnoreUnrecognizedVMOptions -Xshare:off</surefire.argLine>
+            </properties>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration combine.self="override">
+                            <release>8</release>
+                            <showDeprecation>false</showDeprecation>
+                            <showWarnings>true</showWarnings>
+                            <compilerArgs>
+                                <arg>-Xlint:unchecked</arg>
+                                <arg>-Xlint:deprecation</arg>
+                            </compilerArgs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
